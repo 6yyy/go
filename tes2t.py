@@ -7,7 +7,7 @@ import smtplib
 
 def send_email(mes):
     sender = 'polozov@intrice.ru'
-    receivers = ['botnikov@intrice.ru']
+    receivers = ['polozov@intrice.ru']
     message = """From: From Person <polozov@intrice.ru>
 To: To Person <polozov@intrice.ru>
 Subject: selenide-web-test
