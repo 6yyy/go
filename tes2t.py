@@ -19,33 +19,37 @@ selenide-web-test.
     smtpObj.sendmail(sender, receivers, message)
     print("Successfully sent email")
 
-x = str('')
-y = str()
-url = 'http://hudson.connectivegames.com/view/st-web/'
-response = requests.get(url)
-soup = BeautifulSoup(response.text,'html.parser')
-test_add = []
-test_add2 = str()
-for link in soup.find_all('a'):
-    job_name = str(link.get('href'))
-    #print(job_name)
-    if ("job") in job_name:
-        if not ("last") in job_name:
-           if job_name[0]!="/":
-               url2 = str(url + job_name + "lastBuild/api/json")
-               #print(url2)
-               x = urllib.request.urlopen(url2).read().decode("utf-8")
-               buildStatusJson = json.loads(x)
-               if buildStatusJson["result"] == "UNSTABLE":
-                   url3 = str(url + job_name + "lastBuild/testReport/junit/com.connectivegames.sites.utils/SelenideWebTest/api/json")
-                   x2 = urllib.request.urlopen(url3).read().decode("utf-8")
-                   # print(" build status: " + buildStatusJson["result"])
-                   testjson = json.loads(x2)
-                   for item3 in testjson["child"]:
-                       test_add2 += item3.get("name")+"  \n"
-                   test_add = ([buildStatusJson["fullDisplayName"] + buildStatusJson["result"]])
 
-                   y += str(test_add)+"\n"+url + job_name + "lastBuild\n" + test_add2+"\n"
+
+add_result = []
+add_result_error = []
+
+def get_page(url):
+	return urllib.request.urlopen(url).read().decode("utf-8")
+
+def get_json(page):
+	urlPageJson = json.loads(page)
+	return urlPageJson
+
+url_st_web = "http://hudson.connectivegames.com/view/st-web/api/json"
+
+home_page = get_page(url_st_web)
+json_home_page = get_json(home_page)
+for item in json_home_page["jobs"]:
+	if item.get("color") != "disabled":
+		build_page = get_page(item.get("url")+"lastBuild/api/json")
+		build_json = get_json(build_page)
+        if build_json["result"] == "UNSTABLE":
+            build_page_error = get_page(item.get("url") + "lastBuild/testReport/junit/com.connectivegames.sites.utils/SelenideWebTest/api/json")
+            build_json_error = get_json(build_page_error)
+            for item_error in build_json_error["child"]:
+                add_result_error += item_error.get("name") + "  \n"
+		if build_json["result"] != "SUCCESS":
+				add_result += ([build_json["fullDisplayName"] + build_json["result"]])
+print(add_result)
+
+y += add_result+"\n"+url + job_name + "lastBuild\n" + add_result_error+"\n"
+
 print(y)
 
-send_email(y)
+#send_email(y)
