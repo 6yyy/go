@@ -56,8 +56,8 @@ def get_error(url_site):
                                 error_migration +=("\n"+"Migration-test-error "+"\n"+item.get("url")+str(build_json["number"])+ "\n" + "fails  "+job_name+"\n"+"\n")
                     else:
                         add_result += (item.get("url")+str(build_json["number"])+ "\n" +"  " + str(build_json["result"]) +"\n")
-    send_enstable += "\n" + add_result_error + "\n"
-    send_failure += "\n" + str(add_result) + error_migration+"\n"
+    send_enstable += "\n" + url_site + "\n"+ "\n" + add_result_error + "\n"
+    send_failure += "\n" + url_site + "\n"+ "\n" + str(add_result) + error_migration+"\n"
     if len(add_result) > 0:
         send_email(send_failure)
     if len(add_result_error) > 0:
